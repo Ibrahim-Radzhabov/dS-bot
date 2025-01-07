@@ -7,37 +7,41 @@ tg.expand();
 tg.MainButton.textColor = '#FFFFFF';
 tg.MainButton.color = '#2cab37';
 
-// Хранение выбранного товара.
-let item = "";
+let prices = {
+    1: 500,
+    2: 1050,
+    3: 1240,
+    4: 1190,
+    5: 1100,
+    6: 1150
+};
 
-let prices = new Object();
-prices[1] = 220;
-prices[2] = 460;
-prices[3] = 240;
-prices[4] = 190;
-prices[5] = 100;
-prices[6] = 150;
+// Функция для обработки заказа
+function processOrder(items) {
+    let totalAmount = 0;
+    items.forEach(item => {
+        totalAmount += prices[item.id] * item.quantity;
+    });
 
-for (var i = 1; i <= 6; i++) {
-	let btn = document.getElementById("btn" + i.toString());
-	btn.btn_id = i;
-	btn.price = prices[i];
-	btn.addEventListener("click", function() {
-		if (tg.MainButton.isVisible) {
-			tg.MainButton.hide();
-		}
-		else {
-			tg.MainButton.setText("Перейти к оплате (" + btn.price.toString() + "₽)");
-			item = this.btn_id.toString();
-			tg.MainButton.show();
-		}
-	});
+    if (tg.MainButton.isVisible) {
+        tg.MainButton.hide();
+    }
+    tg.MainButton.setText("Перейти к оплате (" + totalAmount.toString() + "₽)");
+    tg.MainButton.show();
+
+    // Отправка данных в тг.
+    Telegram.WebApp.onEvent("mainButtonClicked", function(){
+        tg.sendData(JSON.stringify(items));
+    });
 }
 
-// Отправка данных в тг.
-Telegram.WebApp.onEvent("mainButtonClicked", function(){
-	tg.sendData(item);
-});
+// Пример использования функции processOrder
+const itemsToOrder = [
+    { id: 1, name: 'Product 1', quantity: 2 },
+    { id: 2, name: 'Product 2', quantity: 1 }
+];
+
+processOrder(itemsToOrder);
 
 // Добавление в usercard данных из тг.
 let usercard = document.getElementById("usercard");
