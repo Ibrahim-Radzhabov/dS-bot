@@ -3,43 +3,72 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href="./public/style.css" rel="stylesheet"">
+	<link rel="stylesheet" href="style.css">
 	<title>Document</title>
 </head>
 <body>
 	<div class="container">
 		<div class="inner">
 			<div class="item">
-				<img src="./public/goods-images/1.jpg" alt="" class="img">
-				<button class="btn" id="btn1">Заказать</button>
+				<img src="goods-images/1.jpg" alt="" class="img">
+				<input type="number" id="quantity1" min="0" value="0">
+				<button class="btn" onclick="addToOrder(1)">Добавить в заказ</button>
 			</div>
 			<div class="item">
-				<img src="./public/goods-images/2.jpg" alt="" class="img">
-				<button class="btn" id="btn2">Заказать</button>
+				<img src="goods-images/2.jpg" alt="" class="img">
+				<input type="number" id="quantity2" min="0" value="0">
+				<button class="btn" onclick="addToOrder(2)">Добавить в заказ</button>
 			</div>
 			<div class="item">
-				<img src="./public/goods-images/3.jpg" alt="" class="img">
-				<button class="btn" id="btn3">Заказать</button>
+				<img src="goods-images/3.jpg" alt="" class="img">
+				<input type="number" id="quantity3" min="0" value="0">
+				<button class="btn" onclick="addToOrder(3)">Добавить в заказ</button>
 			</div>
 			<div class="item">
-				<img src="./public/goods-images/4.jpg" alt="" class="img">
-				<button class="btn" id="btn4">Заказать</button>
+				<img src="goods-images/4.jpg" alt="" class="img">
+				<input type="number" id="quantity4" min="0" value="0">
+				<button class="btn" onclick="addToOrder(4)">Добавить в заказ</button>
 			</div>
 			<div class="item">
-				<img src="./public/goods-images/5.jpg" alt="" class="img">
-				<button class="btn" id="btn5">Заказать</button>
+				<img src="goods-images/5.jpg" alt="" class="img">
+				<input type="number" id="quantity5" min="0" value="0">
+				<button class="btn" onclick="addToOrder(5)">Добавить в заказ</button>
 			</div>
 			<div class="item">
-				<img src="./public/goods-images/6.jpg" alt="" class="img">
-				<button class="btn" id="btn6">Заказать</button>
+				<img src="goods-images/6.jpg" alt="" class="img">
+				<input type="number" id="quantity6" min="0" value="0">
+				<button class="btn" onclick="addToOrder(6)">Добавить в заказ</button>
 			</div>
 		</div>
 	</div>
     <!-- блок для передачи информации из телеграма в сайт -->
 	<div class="usercard" id="usercard">
 	</div>
+	
+    <button type="button" onclick="submitOrder()">Order</button>
+
+    <script>
+        let orderItems = [];
+
+        function addToOrder(productId) {
+            const quantity = document.getElementById('quantity' + productId).value;
+            if (quantity > 0) {
+                const existingItem = orderItems.find(item => item.id === productId);
+                if (existingItem) {
+                    existingItem.quantity = quantity;
+                } else {
+                    orderItems.push({ id: productId, name: 'Product ' + productId, quantity: quantity });
+                }
+            }
+        }
+
+        function submitOrder() {
+            processOrder(orderItems);
+        }
+    </script>
+
 	<!-- обязательно для тг-веб-приложения -->
 	<script src="https://telegram.org/js/telegram-web-app.js"></script>
-	<script src="./public/app.js"></script>
+	<script src="app.js"></script>
 </body>
 </html>
