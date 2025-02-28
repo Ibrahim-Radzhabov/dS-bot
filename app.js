@@ -19,14 +19,17 @@ let prices = {
 let cart = [];
 
 // Функция для добавления товара в корзину
-function addToCart(productId) {
-    const product = cart.find(item => item.id === productId);
-    if (product) {
-        product.quantity += 1;
-    } else {
-        cart.push({ id: productId, quantity: 1 });
+function addToOrder(productId) {
+    const quantity = document.getElementById('quantity' + productId).value;
+    if (quantity > 0) {
+        const existingItem = cart.find(item => item.id === productId);
+        if (existingItem) {
+            existingItem.quantity = parseInt(quantity);
+        } else {
+            cart.push({ id: productId, quantity: parseInt(quantity) });
+        }
+        alert("Товар добавлен в корзину");
     }
-    alert("Товар добавлен в корзину");
 }
 
 // Функция для обработки заказа
@@ -49,7 +52,7 @@ function processOrder(items) {
 }
 
 // Функция для оформления заказа
-function checkout() {
+function submitOrder() {
     if (cart.length === 0) {
         alert("Ваша корзина пуста");
         return;
