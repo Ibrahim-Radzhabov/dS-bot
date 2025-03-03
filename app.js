@@ -138,16 +138,15 @@ document.addEventListener('DOMContentLoaded', function() {
 	// Обработчик для кнопки оплаты в Telegram
 	if (tg) {
 		Telegram.WebApp.onEvent('mainButtonClicked', function() {
-	// Обработчик для кнопки оплаты
-	Telegram.WebApp.onEvent('mainButtonClicked', function() {
-		const data = JSON.stringify(cart);
-		tg.sendData(data);
-		console.log('Отправлены данные корзины:', data);
-	});
+			const data = JSON.stringify(cart);
+			tg.sendData(data);
+			console.log('Отправлены данные корзины:', data);
+		});
+	}
 
-	// Добавление в usercard данных из тг
+	// Добавление в usercard данных из Telegram
 	const usercard = document.getElementById("usercard");
-	if (usercard && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+	if (usercard && tg?.initDataUnsafe?.user) {
 		const p = document.createElement("p");
 		p.innerText = `${tg.initDataUnsafe.user.first_name} ${tg.initDataUnsafe.user.last_name}`;
 		usercard.appendChild(p);
