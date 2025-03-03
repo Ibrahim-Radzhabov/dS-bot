@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', function() {
 		const counter = document.getElementById(`counter${id}`);
 		if (counter) {
 			counter.textContent = value;
+			console.log(`Обновлен счетчик для товара ${id}: ${value}`);
+		} else {
+			console.log(`Не найден счетчик для товара ${id}`);
 		}
 	}
 
@@ -34,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		const cartCountElement = document.getElementById('cart-count');
 		if (cartCountElement) {
 			cartCountElement.textContent = count;
+			console.log(`Обновлено общее количество товаров: ${count}`);
 		}
 	}
 
@@ -43,7 +47,10 @@ document.addEventListener('DOMContentLoaded', function() {
 		const cartTotalAmount = document.getElementById('cart-total-amount');
 		let total = 0;
 		
-		if (!cartItems || !cartTotalAmount) return;
+		if (!cartItems || !cartTotalAmount) {
+			console.log('Не найдены элементы корзины');
+			return;
+		}
 		
 		cartItems.innerHTML = '';
 		
@@ -63,28 +70,49 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 		
 		cartTotalAmount.textContent = total;
+		console.log(`Обновлена сумма корзины: ${total} руб.`);
 	}
 
-	// Обработчики для кнопок счетчика
-	document.querySelectorAll('.counter-btn').forEach(button => {
-		button.addEventListener('click', (e) => {
-			e.preventDefault(); // Предотвращаем стандартное поведение кнопки
-			const id = e.target.dataset.id;
-			const isPlus = e.target.classList.contains('plus');
+	// Находим все кнопки плюс и минус
+	const plusButtons = document.querySelectorAll('.counter-btn.plus');
+	const minusButtons = document.querySelectorAll('.counter-btn.minus');
+
+	console.log(`Найдено кнопок плюс: ${plusButtons.length}`);
+	console.log(`Найдено кнопок минус: ${minusButtons.length}`);
+
+	// Обработчики для кнопок плюс
+	plusButtons.forEach(button => {
+		button.addEventListener('click', function(e) {
+			e.preventDefault();
+			const id = this.dataset.id;
+			console.log(`Нажата кнопка плюс для товара ${id}`);
 			
-			// Инициализируем значение в корзине, если его нет
 			if (!cart[id]) {
 				cart[id] = 0;
 			}
+			cart[id]++;
 			
-			// Изменяем значение
-			if (isPlus) {
-				cart[id]++;
-			} else if (cart[id] > 0) {
-				cart[id]--;
+			console.log(`Увеличено количество товара ${id}: ${cart[id]}`);
+			updateCounter(id, cart[id]);
+			updateCartCount();
+			updateCart();
+		});
+	});
+
+	// Обработчики для кнопок минус
+	minusButtons.forEach(button => {
+		button.addEventListener('click', function(e) {
+			e.preventDefault();
+			const id = this.dataset.id;
+			console.log(`Нажата кнопка минус для товара ${id}`);
+			
+			if (!cart[id]) {
+				cart[id] = 0;
 			}
-			
-			console.log(`Товар ${id}: ${cart[id]}`); // Отладочный вывод
+			if (cart[id] > 0) {
+				cart[id]--;
+				console.log(`Уменьшено количество товара ${id}: ${cart[id]}`);
+			}
 			
 			updateCounter(id, cart[id]);
 			updateCartCount();
@@ -99,6 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			const cartElement = document.getElementById('cart');
 			if (cartElement) {
 				cartElement.classList.toggle('active');
+				console.log('Переключено состояние корзины');
 			}
 		});
 	}
@@ -110,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (cart[id] && cart[id] > 0) {
 				tg.MainButton.text = `Оплатить ${document.getElementById('cart-total-amount').textContent} руб.`;
 				tg.MainButton.show();
+				console.log(`Показана кнопка оплаты для товара ${id}`);
 			}
 		});
 	});
@@ -118,6 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	Telegram.WebApp.onEvent('mainButtonClicked', function() {
 		const data = JSON.stringify(cart);
 		tg.sendData(data);
+		console.log('Отправлены данные корзины:', data);
 	});
 
 	// Добавление в usercard данных из тг
