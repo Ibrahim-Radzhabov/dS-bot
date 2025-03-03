@@ -1,13 +1,21 @@
-let tg = window.Telegram.WebApp;
+console.log('Скрипт начал выполнение');
 
-// Ждем полной загрузки DOM
+// Ждем загрузки DOM
 document.addEventListener('DOMContentLoaded', function() {
-	// Расширяем на весь экран
-	tg.expand();
-
-	// Кнопка просмотра заказа
-	tg.MainButton.textColor = '#FFFFFF';
-	tg.MainButton.color = '#2cab37';
+	console.log('DOM загружен');
+	
+	// Инициализация Telegram WebApp (если доступен)
+	let tg = window.Telegram?.WebApp;
+	if (tg) {
+		console.log('Telegram WebApp инициализирован');
+		tg.expand();
+		
+		// Настройка главной кнопки Telegram
+		tg.MainButton.textColor = '#FFFFFF';
+		tg.MainButton.color = '#2cab37';
+	} else {
+		console.log('Запущено в обычном браузере');
+	}
 
 	// Инициализация корзины
 	let cart = {};
@@ -71,53 +79,38 @@ document.addEventListener('DOMContentLoaded', function() {
 		
 		cartTotalAmount.textContent = total;
 		console.log(`Обновлена сумма корзины: ${total} руб.`);
+
+		// Обновляем кнопку Telegram, если доступна
+		if (tg && total > 0) {
+			tg.MainButton.text = `Оплатить ${total} руб.`;
+			tg.MainButton.show();
+		}
 	}
 
-	// Находим все кнопки плюс и минус
-	const plusButtons = document.querySelectorAll('.counter-btn.plus');
-	const minusButtons = document.querySelectorAll('.counter-btn.minus');
-
-	console.log(`Найдено кнопок плюс: ${plusButtons.length}`);
-	console.log(`Найдено кнопок минус: ${minusButtons.length}`);
-
-	// Обработчики для кнопок плюс
-	plusButtons.forEach(button => {
-		button.addEventListener('click', function(e) {
+	// Обработчик клика для всех кнопок (+ и -)
+	document.addEventListener('click', function(e) {
+		if (e.target.classList.contains('counter-btn')) {
 			e.preventDefault();
-			const id = this.dataset.id;
-			console.log(`Нажата кнопка плюс для товара ${id}`);
+			const id = e.target.dataset.id;
+			const isPlus = e.target.classList.contains('plus');
+			
+			console.log(`Нажата кнопка ${isPlus ? 'плюс' : 'минус'} для товара ${id}`);
 			
 			if (!cart[id]) {
 				cart[id] = 0;
 			}
-			cart[id]++;
 			
-			console.log(`Увеличено количество товара ${id}: ${cart[id]}`);
-			updateCounter(id, cart[id]);
-			updateCartCount();
-			updateCart();
-		});
-	});
-
-	// Обработчики для кнопок минус
-	minusButtons.forEach(button => {
-		button.addEventListener('click', function(e) {
-			e.preventDefault();
-			const id = this.dataset.id;
-			console.log(`Нажата кнопка минус для товара ${id}`);
-			
-			if (!cart[id]) {
-				cart[id] = 0;
-			}
-			if (cart[id] > 0) {
+			if (isPlus) {
+				cart[id]++;
+			} else if (cart[id] > 0) {
 				cart[id]--;
-				console.log(`Уменьшено количество товара ${id}: ${cart[id]}`);
 			}
 			
+			console.log(`${isPlus ? 'Увеличено' : 'Уменьшено'} количество товара ${id}: ${cart[id]}`);
 			updateCounter(id, cart[id]);
 			updateCartCount();
 			updateCart();
-		});
+		}
 	});
 
 	// Обработчик для иконки корзины
@@ -132,18 +125,19 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	}
 
-	// Обработчики для кнопок "В корзину"
+	// Обработчик для кнопок "В корзину"
 	document.querySelectorAll('.btn').forEach(btn => {
 		btn.addEventListener('click', (e) => {
 			const id = e.target.dataset.id;
 			if (cart[id] && cart[id] > 0) {
-				tg.MainButton.text = `Оплатить ${document.getElementById('cart-total-amount').textContent} руб.`;
-				tg.MainButton.show();
-				console.log(`Показана кнопка оплаты для товара ${id}`);
+				updateCart(); // Обновляем корзину и кнопку оплаты
 			}
 		});
 	});
 
+	// Обработчик для кнопки оплаты в Telegram
+	if (tg) {
+		Telegram.WebApp.onEvent('mainButtonClicked', function() {
 	// Обработчик для кнопки оплаты
 	Telegram.WebApp.onEvent('mainButtonClicked', function() {
 		const data = JSON.stringify(cart);
@@ -153,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// Добавление в usercard данных из тг
 	const usercard = document.getElementById("usercard");
-	if (usercard && tg.initDataUnsafe.user) {
+	if (usercard && tg.initDataUnsafe && tg.initDataUnsafe.user) {
 		const p = document.createElement("p");
 		p.innerText = `${tg.initDataUnsafe.user.first_name} ${tg.initDataUnsafe.user.last_name}`;
 		usercard.appendChild(p);
