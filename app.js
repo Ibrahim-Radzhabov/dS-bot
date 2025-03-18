@@ -244,25 +244,37 @@ document.addEventListener('DOMContentLoaded', function() {
 				return;
 			}
 
-			const orderDetails = {
-				type: 'order',
-				payload: {
-					...formatOrder(),
-					customerInfo: {
-						fullName,
-						phone,
-						city,
-						address,
-						paymentMethod: selectedPaymentMethod
-					}
+			// Формируем данные о товарах в нужном формате
+			let orderItems = [];
+			for (const [id, count] of Object.entries(cart)) {
+				if (count > 0) {
+					orderItems.push({
+						product_id: id,
+						quantity: count
+					});
+				}
+			}
+
+			// Формируем объект заказа в соответствии с ожидаемой структурой
+			const orderData = {
+				order_info: {
+					items: orderItems,
+					customer: {
+						name: fullName,
+						phone: phone,
+						city: city,
+						address: address
+					},
+					payment_method: selectedPaymentMethod,
+					status: "pending"
 				}
 			};
 
 			if (tg) {
-				tg.sendData(JSON.stringify(orderDetails));
-				console.log('Заказ отправлен в Telegram');
+				tg.sendData(JSON.stringify(orderData));
+				console.log('Заказ отправлен в Telegram:', orderData);
 			} else {
-				console.log('Заказ оформлен:', orderDetails);
+				console.log('Заказ оформлен:', orderData);
 				alert('Заказ оформлен! Менеджер свяжется с вами.');
 			}
 
