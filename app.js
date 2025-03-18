@@ -28,6 +28,38 @@ document.addEventListener('DOMContentLoaded', function() {
 		6: 1800
 	};
 
+	// Функция форматирования заказа для отправки
+	function formatOrder() {
+		let orderText = '🛍 *Новый заказ*\n\n';
+		let totalSum = 0;
+
+		for (const [id, count] of Object.entries(cart)) {
+			if (count > 0) {
+				const itemTotal = count * prices[id];
+				totalSum += itemTotal;
+				orderText += `📦 Товар ${id}\n`;
+				orderText += `   Количество: ${count} шт.\n`;
+				orderText += `   Цена: ${prices[id]} руб.\n`;
+				orderText += `   Сумма: ${itemTotal} руб.\n\n`;
+			}
+		}
+
+		orderText += `\n💰 *Итого: ${totalSum} руб.*`;
+
+		if (tg?.initDataUnsafe?.user) {
+			const user = tg.initDataUnsafe.user;
+			orderText += `\n\n👤 *Заказчик:*\n`;
+			orderText += `${user.first_name}`;
+			if (user.last_name) orderText += ` ${user.last_name}`;
+			if (user.username) orderText += `\n@${user.username}`;
+		}
+
+		return {
+			formatted: orderText,
+			totalSum: totalSum
+		};
+	}
+
 	// Функция обновления счетчика
 	function updateCounter(id, value) {
 		const counter = document.getElementById(`counter${id}`);
@@ -53,6 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	function updateCart() {
 		const cartItems = document.getElementById('cart-items');
 		const cartTotalAmount = document.getElementById('cart-total-amount');
+		const orderButton = document.getElementById('order-button');
 		let total = 0;
 		
 		if (!cartItems || !cartTotalAmount) {
@@ -80,10 +113,13 @@ document.addEventListener('DOMContentLoaded', function() {
 		cartTotalAmount.textContent = total;
 		console.log(`Обновлена сумма корзины: ${total} руб.`);
 
-		// Обновляем кнопку Telegram, если доступна
-		if (tg && total > 0) {
-			tg.MainButton.text = `Оплатить ${total} руб.`;
-			tg.MainButton.show();
+		// Показываем или скрываем кнопку заказа
+		if (orderButton) {
+			if (total > 0) {
+				orderButton.style.display = 'block';
+			} else {
+				orderButton.style.display = 'none';
+			}
 		}
 	}
 
@@ -125,30 +161,37 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	}
 
-	// Обработчик для кнопок "В корзину"
-	document.querySelectorAll('.btn').forEach(btn => {
-		btn.addEventListener('click', (e) => {
-			const id = e.target.dataset.id;
-			if (cart[id] && cart[id] > 0) {
-				updateCart(); // Обновляем корзину и кнопку оплаты
+	// Обработчик для кнопки "Заказ готов"
+	const orderButton = document.getElementById('order-button');
+	if (orderButton) {
+		orderButton.addEventListener('click', () => {
+			const order = formatOrder();
+			if (order.totalSum > 0) {
+				if (tg) {
+					tg.sendData(JSON.stringify({
+						type: 'order',
+						payload: order.formatted
+					}));
+					console.log('Заказ отправлен в Telegram');
+				} else {
+					console.log('Заказ оформлен:', order.formatted);
+					alert('Заказ оформлен! Менеджер свяжется с вами.');
+				}
+				
+				// Очищаем корзину после отправки
+				cart = {};
+				updateCartCount();
+				updateCart();
+				
+				// Закрываем корзину
+				const cartElement = document.getElementById('cart');
+				if (cartElement) {
+					cartElement.classList.remove('active');
+				}
 			}
 		});
-	});
-
-	// Обработчик для кнопки оплаты в Telegram
-	if (tg) {
-		Telegram.WebApp.onEvent('mainButtonClicked', function() {
-			const data = JSON.stringify(cart);
-			tg.sendData(data);
-			console.log('Отправлены данные корзины:', data);
-		});
 	}
 
-	// Добавление в usercard данных из Telegram
-	const usercard = document.getElementById("usercard");
-	if (usercard && tg?.initDataUnsafe?.user) {
-		const p = document.createElement("p");
-		p.innerText = `${tg.initDataUnsafe.user.first_name} ${tg.initDataUnsafe.user.last_name}`;
-		usercard.appendChild(p);
-	}
+	// Инициализация корзины при загрузке
+	updateCart();
 });
