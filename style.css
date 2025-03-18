@@ -106,8 +106,8 @@ body {
 
 .cart-icon {
 	position: fixed;
-	top: 15px;
-	right: 15px;
+	bottom: 20px;
+	right: 20px;
 	font-size: 28px;
 	cursor: pointer;
 	background: var(--tg-theme-button-color);
@@ -222,4 +222,104 @@ body {
 	background: var(--tg-theme-secondary-bg-color);
 	border-radius: 8px;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cart-title {
+	position: fixed;
+	bottom: 85px;
+	right: 20px;
+	background: var(--tg-theme-secondary-bg-color);
+	padding: 8px 15px;
+	border-radius: 20px;
+	font-size: 14px;
+	color: var(--tg-theme-text-color);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	z-index: 999;
+}
+
+/* Стили для страницы оформления заказа */
+.order-page {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: var(--tg-theme-bg-color);
+	z-index: 1001;
+	padding: 20px;
+	display: none;
+	overflow-y: auto;
+}
+
+.order-page.active {
+	display: block;
+}
+
+.order-form {
+	max-width: 600px;
+	margin: 0 auto;
+}
+
+.form-group {
+	margin-bottom: 20px;
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: 8px;
+	color: var(--tg-theme-text-color);
+	font-weight: bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+	width: 100%;
+	padding: 12px;
+	border: 1px solid var(--tg-theme-hint-color);
+	border-radius: 8px;
+	background: var(--tg-theme-secondary-bg-color);
+	color: var(--tg-theme-text-color);
+	font-size: 16px;
+}
+
+.payment-methods {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin-bottom: 20px;
+}
+
+.payment-method {
+	padding: 15px;
+	border-radius: 8px;
+	background: var(--tg-theme-secondary-bg-color);
+	text-align: center;
+	cursor: pointer;
+	transition: transform 0.2s;
+}
+
+.payment-method.active {
+	background: var(--tg-theme-button-color);
+	color: var(--tg-theme-button-text-color);
+}
+
+.back-button {
+	position: fixed;
+	top: 20px;
+	left: 20px;
+	padding: 10px;
+	background: var(--tg-theme-button-color);
+	color: var(--tg-theme-button-text-color);
+	border: none;
+	border-radius: 50%;
+	cursor: pointer;
+	z-index: 1002;
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 20px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
