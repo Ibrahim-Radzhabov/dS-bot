@@ -163,32 +163,114 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// Обработчик для кнопки "Заказ готов"
 	const orderButton = document.getElementById('order-button');
+	const orderPage = document.getElementById('order-page');
+	const backToCartButton = document.getElementById('back-to-cart');
+	const submitOrderButton = document.getElementById('submit-order');
+	const paymentMethods = document.querySelectorAll('.payment-method');
+	let selectedPaymentMethod = null;
+
 	if (orderButton) {
 		orderButton.addEventListener('click', () => {
 			const order = formatOrder();
 			if (order.totalSum > 0) {
-				if (tg) {
-					tg.sendData(JSON.stringify({
-						type: 'order',
-						payload: order.formatted
-					}));
-					console.log('Заказ отправлен в Telegram');
-				} else {
-					console.log('Заказ оформлен:', order.formatted);
-					alert('Заказ оформлен! Менеджер свяжется с вами.');
-				}
-				
-				// Очищаем корзину после отправки
-				cart = {};
-				updateCartCount();
-				updateCart();
-				
-				// Закрываем корзину
+				// Показываем страницу оформления заказа
+				orderPage.classList.add('active');
+				// Скрываем корзину
 				const cartElement = document.getElementById('cart');
 				if (cartElement) {
 					cartElement.classList.remove('active');
 				}
 			}
+		});
+	}
+
+	// Обработчик для кнопки возврата к корзине
+	if (backToCartButton) {
+		backToCartButton.addEventListener('click', () => {
+			orderPage.classList.remove('active');
+			const cartElement = document.getElementById('cart');
+			if (cartElement) {
+				cartElement.classList.add('active');
+			}
+		});
+	}
+
+	// Обработчики для методов оплаты
+	paymentMethods.forEach(method => {
+		method.addEventListener('click', () => {
+			paymentMethods.forEach(m => m.classList.remove('active'));
+			method.classList.add('active');
+			selectedPaymentMethod = method.dataset.method;
+		});
+	});
+
+	// Форматирование номера телефона
+	const phoneInput = document.getElementById('phone');
+	if (phoneInput) {
+		phoneInput.addEventListener('input', function(e) {
+			let value = e.target.value.replace(/\D/g, '');
+			if (value.length > 0) {
+				if (value[0] === '7' || value[0] === '8') {
+					value = value.substring(1);
+				}
+				let formattedValue = '+7';
+				if (value.length > 0) {
+					formattedValue += ' (' + value.substring(0, 3);
+				}
+				if (value.length > 3) {
+					formattedValue += ') ' + value.substring(3, 6);
+				}
+				if (value.length > 6) {
+					formattedValue += '-' + value.substring(6, 8);
+				}
+				if (value.length > 8) {
+					formattedValue += '-' + value.substring(8, 10);
+				}
+				e.target.value = formattedValue;
+			}
+		});
+	}
+
+	// Обработчик отправки формы заказа
+	if (submitOrderButton) {
+		submitOrderButton.addEventListener('click', () => {
+			const fullName = document.getElementById('fullName').value;
+			const phone = document.getElementById('phone').value;
+			const city = document.getElementById('city').value;
+			const address = document.getElementById('address').value;
+
+			if (!fullName || !phone || !city || !address || !selectedPaymentMethod) {
+				alert('Пожалуйста, заполните все поля');
+				return;
+			}
+
+			const orderDetails = {
+				type: 'order',
+				payload: {
+					...formatOrder(),
+					customerInfo: {
+						fullName,
+						phone,
+						city,
+						address,
+						paymentMethod: selectedPaymentMethod
+					}
+				}
+			};
+
+			if (tg) {
+				tg.sendData(JSON.stringify(orderDetails));
+				console.log('Заказ отправлен в Telegram');
+			} else {
+				console.log('Заказ оформлен:', orderDetails);
+				alert('Заказ оформлен! Менеджер свяжется с вами.');
+			}
+
+			// Очищаем корзину и скрываем страницу заказа
+			cart = {};
+			updateCartCount();
+			updateCart();
+			orderPage.classList.remove('active');
 		});
 	}
 
