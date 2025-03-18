@@ -18,6 +18,7 @@
 					<span class="counter" id="counter1">0</span>
 					<button class="counter-btn plus" data-id="1">+</button>
 				</div>
+				<button class="btn" id="btn1" data-id="1">В корзину</button>
 			</div>
 			<div class="item">
 				<img src="2.jpg" alt="" class="img">
@@ -26,6 +27,7 @@
 					<span class="counter" id="counter2">0</span>
 					<button class="counter-btn plus" data-id="2">+</button>
 				</div>
+				<button class="btn" id="btn2" data-id="2">В корзину</button>
 			</div>
 			<div class="item">
 				<img src="3.jpg" alt="" class="img">
@@ -34,6 +36,7 @@
 					<span class="counter" id="counter3">0</span>
 					<button class="counter-btn plus" data-id="3">+</button>
 				</div>
+				<button class="btn" id="btn3" data-id="3">В корзину</button>
 			</div>
 			<div class="item">
 				<img src="4.jpg" alt="" class="img">
@@ -42,6 +45,7 @@
 					<span class="counter" id="counter4">0</span>
 					<button class="counter-btn plus" data-id="4">+</button>
 				</div>
+				<button class="btn" id="btn4" data-id="4">В корзину</button>
 			</div>
 			<div class="item">
 				<img src="5.jpg" alt="" class="img">
@@ -50,6 +54,7 @@
 					<span class="counter" id="counter5">0</span>
 					<button class="counter-btn plus" data-id="5">+</button>
 				</div>
+				<button class="btn" id="btn5" data-id="5">В корзину</button>
 			</div>
 			<div class="item">
 				<img src="6.jpg" alt="" class="img">
@@ -58,25 +63,58 @@
 					<span class="counter" id="counter6">0</span>
 					<button class="counter-btn plus" data-id="6">+</button>
 				</div>
+				<button class="btn" id="btn6" data-id="6">В корзину</button>
 			</div>
 		</div>
 	</div>
 
-	<!-- Корзина -->
-	<div class="cart" id="cart">
-		<h2>Корзина</h2>
-		<div class="cart-items" id="cart-items"></div>
-		<div class="cart-total">
-			<span>Итого: </span>
-			<span id="cart-total-amount">0</span> руб.
-		</div>
-		<button class="order-button" id="order-button">Заказ готов</button>
-	</div>
-
 	<!-- Иконка корзины -->
+	<div class="cart-title">Корзина покупок</div>
 	<div class="cart-icon" id="cart-icon">
 		<span class="cart-count" id="cart-count">0</span>
 		🛒
+	</div>
+
+	<!-- Страница оформления заказа -->
+	<div class="order-page" id="order-page">
+		<button class="back-button" id="back-to-cart">←</button>
+		<div class="order-form">
+			<h2>Оформление заказа</h2>
+			
+			<div class="form-group">
+				<label for="fullName">ФИО</label>
+				<input type="text" id="fullName" required placeholder="Введите ваше полное имя">
+			</div>
+
+			<div class="form-group">
+				<label for="phone">Номер телефона</label>
+				<input type="tel" id="phone" required placeholder="+7 (___) ___-__-__">
+			</div>
+
+			<div class="form-group">
+				<label for="city">Город</label>
+				<input type="text" id="city" required placeholder="Введите город доставки">
+			</div>
+
+			<div class="form-group">
+				<label for="address">Адрес доставки</label>
+				<textarea id="address" required placeholder="Введите полный адрес доставки"></textarea>
+			</div>
+
+			<div class="form-group">
+				<label>Способ оплаты</label>
+				<div class="payment-methods">
+					<div class="payment-method" data-method="card">
+						💳 Картой
+					</div>
+					<div class="payment-method" data-method="cash">
+						💵 Наличными
+					</div>
+				</div>
+			</div>
+
+			<button class="order-button" id="submit-order">Подтвердить заказ</button>
+		</div>
 	</div>
 
 	<!-- блок для передачи информации из телеграма в сайт -->
